@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - CropVault</title>
+  <style>
+    :root{--bg:#ffffff;--bg-alt:#f6fdf6;--surface:#ffffff;--surface-hover:#f0fdf4;--text:#0a0a0a;--text-muted:#525252;--accent:#16a34a;--accent-hover:#15803d;--accent-glow:rgba(22,163,74,0.15);--border:#e5e7eb;--shadow:0 4px 6px -1px rgba(0,0,0,0.05);--radius:12px;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+    [data-theme="dark"]{--bg:#000000;--bg-alt:#050a05;--surface:#0a0a0a;--surface-hover:#052e16;--text:#ffffff;--text-muted:#a3a3a3;--accent:#22c55e;--accent-hover:#16a34a;--accent-glow:rgba(34,197,94,0.15);--border:#1a1a1a;--shadow:0 4px 6px -1px rgba(0,0,0,0.5)}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:var(--transition);min-height:100vh}
+    .top-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:rgba(var(--bg),0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:1000}
+    .nav-left{display:flex;align-items:center;gap:1.5rem}
+    .logo{font-size:1.5rem;font-weight:800;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:0.5rem}
+    .nav-links{display:flex;gap:1rem;list-style:none}
+    .nav-links a{color:var(--text-muted);text-decoration:none;font-weight:500;font-size:0.9rem;padding:0.5rem 1rem;border-radius:var(--radius);transition:var(--transition)}
+    .nav-links a:hover{color:var(--accent);background:var(--accent-glow)}
+    .nav-right{display:flex;align-items:center;gap:1rem}
+    .theme-toggle{background:none;border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:var(--radius);font-weight:600;font-size:0.95rem;cursor:pointer;transition:var(--transition);border:none;text-decoration:none}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+    .btn-danger{background:#dc2626;color:white;padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600}
+    .btn-danger:hover{background:#b91c1c}
+    .dashboard{display:flex;min-height:100vh;padding-top:70px}
+    .sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem;position:fixed;height:calc(100vh - 70px);overflow-y:auto}
+    .sidebar-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+    .sidebar-header h2{font-size:1.25rem;display:flex;align-items:center;gap:0.5rem}
+    .sidebar-nav{list-style:none}
+    .sidebar-nav li{margin-bottom:0.5rem}
+    .sidebar-nav a{display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1rem;color:var(--text-muted);text-decoration:none;border-radius:var(--radius);font-weight:500;transition:var(--transition);cursor:pointer}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:var(--accent-glow);color:var(--accent)}
+    .main-content{flex:1;margin-left:260px;padding:2rem;max-width:calc(100% - 260px)}
+    .dashboard-header{margin-bottom:2rem}
+    .dashboard-header h1{font-size:1.75rem;margin-bottom:0.25rem}
+    .dashboard-header p{color:var(--text-muted)}
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-bottom:2rem}
+    .dashboard-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:var(--transition)}
+    .dashboard-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .dashboard-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .dashboard-card-title{color:var(--text-muted);font-size:0.875rem;font-weight:500}
+    .dashboard-card-icon{width:40px;height:40px;border-radius:10px;background:var(--accent-glow);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+    .dashboard-card-value{font-size:1.875rem;font-weight:700;margin-bottom:0.25rem}
+    .dashboard-card-change{font-size:0.875rem;color:var(--accent);font-weight:600}
+    .chart-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+    .chart-area h3{margin-bottom:1rem;font-size:1.1rem}
+    .users-table{width:100%;border-collapse:collapse}
+    .users-table th,.users-table td{padding:1rem;text-align:left;border-bottom:1px solid var(--border)}
+    .users-table th{color:var(--text-muted);font-weight:600;font-size:0.875rem}
+    .users-table td{font-size:0.95rem}
+    .users-table tr:hover td{background:var(--surface-hover)}
+    .empty-state{text-align:center;padding:3rem;color:var(--text-muted)}
+    .small-chart-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem}
+    .small-chart-area h3{margin-bottom:0.75rem;font-size:1.1rem}
+    .small-bar-chart{display:flex;align-items:flex-end;gap:1rem;height:120px;padding-top:0.5rem}
+    .small-bar-chart .bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.5rem}
+    .small-bar-chart .bar{width:100%;background:var(--accent);border-radius:6px 6px 0 0;opacity:0.8}
+    .small-bar-chart .bar-label{font-size:0.75rem;color:var(--text-muted)}
+    .admin-badge{background:var(--accent);color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:2000;opacity:0;transition:opacity 0.3s;padding:2rem}
+    .modal-overlay.active{display:flex;opacity:1}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);transform:scale(0.95);transition:transform 0.3s}
+    .modal-overlay.active .modal{transform:scale(1)}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;border-bottom:1px solid var(--border)}
+    .modal-header h2{font-size:1.25rem}
+    .modal-close{background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+    .modal-close:hover{background:var(--surface-hover);color:var(--text)}
+    .modal-body{padding:1.5rem}
+    .modal-stat{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem}
+    .modal-stat-item{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+    .modal-stat-value{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .modal-stat-label{font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem}
+    .modal-list{list-style:none}
+    .modal-list li{padding:0.875rem 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .modal-list li:last-child{border-bottom:none}
+    .modal-list-label{color:var(--text-muted);font-size:0.9rem}
+    .modal-list-value{font-weight:600;font-size:0.9rem}
+    .toast{position:fixed;bottom:2rem;right:2rem;background:var(--accent);color:white;padding:1rem 1.5rem;border-radius:var(--radius);font-weight:500;box-shadow:0 10px 15px -3px var(--accent-glow);transform:translateY(100px);opacity:0;transition:all 0.3s;z-index:3000}
+    .toast.show{transform:translateY(0);opacity:1}
+    @media(max-width:768px){.sidebar{transform:translateX(-100%);z-index:999}.main-content{margin-left:0;max-width:100%}.modal{max-width:100%}.modal-stat{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-left"><a href="index.html" class="logo">🌾 CropVault</a><ul class="nav-links"></ul></div>
+    <div class="nav-right"></div>
+  </nav>
+
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-header"><h2>🌾 Admin Panel</h2></div>
+      <ul class="sidebar-nav">
+        <li><a href="admin.html" class="active">📊 Dashboard</a></li>
+        <li><a href="#users">👥 Users</a></li>
+        <li><a onclick="openModal('analyticsModal')">📈 Analytics</a></li>
+        <li><a onclick="openModal('systemModal')">⚙️ System</a></li>
+        <li><a onclick="openModal('logsModal')">📝 Logs</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="dashboard-header">
+        <div style="display:flex;align-items:center;gap:1rem"><h1>Administrator Control</h1><span class="admin-badge">Admin</span></div>
+        <p>Manage users, monitor system health, and view platform analytics</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card"><div class="dashboard-card-header"><span class="dashboard-card-title">Total Users</span><div class="dashboard-card-icon">👥</div></div><div class="dashboard-card-value" id="totalUsers">0</div><div class="dashboard-card-change">Registered accounts</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-header"><span class="dashboard-card-title">System Status</span><div class="dashboard-card-icon">🟢</div></div><div class="dashboard-card-value" style="color:var(--accent)">Online</div><div class="dashboard-card-change">All systems operational</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-header"><span class="dashboard-card-title">Admin Since</span><div class="dashboard-card-icon">🛡️</div></div><div class="dashboard-card-value" style="font-size:1.25rem">—</div><div class="dashboard-card-change">Superuser access</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-header"><span class="dashboard-card-title">Storage</span><div class="dashboard-card-icon">💾</div></div><div class="dashboard-card-value" style="font-size:1.25rem">—</div><div class="dashboard-card-change">Browser localStorage</div></div>
+      </div>
+
+      <div class="chart-area" id="users">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem"><h3>Registered Users</h3><button class="btn btn-outline" onclick="exportUsers();showToast('Users exported successfully')">📥 Export JSON</button></div>
+        <div id="usersTableContainer">
+          <table class="users-table"><thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="small-chart-area"><h3>Weekly Activity</h3><div class="small-bar-chart"><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Mon</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Tue</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Wed</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Thu</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Fri</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Sat</span></div><div class="bar-item"><div class="bar" style="height:0%"></div><span class="bar-label">Sun</span></div></div></div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="analyticsModal"><div class="modal"><div class="modal-header"><h2>📈 Platform Analytics</h2><button class="modal-close" onclick="closeModal('analyticsModal')">&times;</button></div><div class="modal-body"><div class="modal-stat"><div class="modal-stat-item"><div class="modal-stat-value">0</div><div class="modal-stat-label">New Signups (Week)</div></div><div class="modal-stat-item"><div class="modal-stat-value">0</div><div class="modal-stat-label">Active Sessions</div></div><div class="modal-stat-item"><div class="modal-stat-value">$0</div><div class="modal-stat-label">Avg Savings / User</div></div><div class="modal-stat-item"><div class="modal-stat-value">0%</div><div class="modal-stat-label">Retention Rate</div></div></div></div></div></div>
+  <div class="modal-overlay" id="systemModal"><div class="modal"><div class="modal-header"><h2>⚙️ System Status</h2><button class="modal-close" onclick="closeModal('systemModal')">&times;</button></div><div class="modal-body"><ul class="modal-list"><li><span class="modal-list-label">Version</span><span class="modal-list-value">CropVault v0.0.0</span></li><li><span class="modal-list-label">Storage Engine</span><span class="modal-list-value">Browser localStorage</span></li><li><span class="modal-list-label">Database Size</span><span class="modal-list-value">0 KB / 5 MB</span></li><li><span class="modal-list-label">Last Backup</span><span class="modal-list-value">—</span></li><li><span class="modal-list-label">Status</span><span class="modal-list-value" style="color:var(--accent)">All Operational</span></li></ul></div></div></div>
+  <div class="modal-overlay" id="logsModal"><div class="modal"><div class="modal-header"><h2>📝 System Logs</h2><button class="modal-close" onclick="closeModal('logsModal')">&times;</button></div><div class="modal-body"><div style="text-align:center;padding:2rem;color:var(--text-muted)"><div style="font-size:2rem;margin-bottom:0.5rem">📝</div><div>No logs available.</div></div></div></div></div>
+
+  <script>
+    const ADMIN_EMAIL='sunshine@schools.com',ADMIN_PASSWORD='sunshine schools';
+    const getUsers=()=>{try{return JSON.parse(localStorage.getItem('cropvault-users')||'[]')}catch{return[]}};
+    const getCurrentUser=()=>{try{return JSON.parse(localStorage.getItem('cropvault-current')||'null')}catch{return null}};
+    const isAdmin=()=>{const u=getCurrentUser();return u&&u.isAdmin===true};
+    const requireAdmin=()=>{if(!isAdmin())window.location.href='login.html'};
+    const deleteUser=(email)=>{let u=getUsers();u=u.filter(x=>x.email!==email);localStorage.setItem('cropvault-users',JSON.stringify(u))};
+    const logout=()=>{localStorage.removeItem('cropvault-current');window.location.href='index.html'};
+    const initTheme=()=>{const s=localStorage.getItem('cropvault-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',s);const b=document.querySelector('.theme-toggle');if(b)b.textContent=s==='dark'?'☀️':'🌙'};
+    const toggleTheme=()=>{const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('cropvault-theme',n);const b=document.querySelector('.theme-toggle');if(b)b.textContent=n==='dark'?'☀️':'🌙'};
+    const openModal=(id)=>document.getElementById(id).classList.add('active');
+    const closeModal=(id)=>document.getElementById(id).classList.remove('active');
+    const showToast=(msg)=>{const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},3000)};
+    const updateNav=()=>{const u=getCurrentUser();const l=document.querySelector('.nav-links');const r=document.querySelector('.nav-right');if(!l||!r)return;if(u){l.innerHTML='<li><a href="admin.html">Admin Panel</a></li><li><a href="index.html">Home</a></li>';r.innerHTML='<button class="theme-toggle" onclick="toggleTheme()">🌙</button><button class="btn btn-outline" onclick="logout()">Logout</button>'}else{l.innerHTML='<li><a href="login.html">Login</a></li><li><a href="signup.html">Sign Up</a></li>';r.innerHTML='<button class="theme-toggle" onclick="toggleTheme()">🌙</button>'}initTheme()};
+    document.addEventListener('DOMContentLoaded',()=>{requireAdmin();updateNav();renderUsers();document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}))});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active'))});
+    function renderUsers(){const u=getUsers();const t=document.getElementById('usersTableBody');const e=document.getElementById('totalUsers');e.textContent=u.length;if(u.length===0){t.innerHTML='<tr><td colspan="4" class="empty-state"><div style="font-size:2rem;margin-bottom:0.5rem">📭</div><div>No users registered yet</div></td></tr>';return}t.innerHTML=u.map(x=>`<tr><td><strong>${x.name}</strong></td><td>${x.email}</td><td style="color:var(--text-muted)">${new Date(x.created).toLocaleDateString()}</td><td><button class="btn-danger" onclick="removeUser('${x.email}')">Delete</button></td></tr>`).join('')}
+    function removeUser(email){if(!confirm('Delete '+email+'? This cannot be undone.'))return;deleteUser(email);renderUsers();showToast('User deleted')}
+    function exportUsers(){const u=getUsers();const d=JSON.stringify(u,null,2);const b=new Blob([d],{type:'application/json'});const u2=URL.createObjectURL(b);const a=document.createElement('a');a.href=u2;a.download='cropvault-users.json';a.click();URL.revokeObjectURL(u2)}
+  </script>
+</body>
+</html>

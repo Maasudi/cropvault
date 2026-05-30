@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CropVault</title>
+  <style>
+    :root {
+      --bg: #ffffff; --bg-alt: #f6fdf6; --surface: #ffffff; --surface-hover: #f0fdf4;
+      --text: #0a0a0a; --text-muted: #525252; --accent: #16a34a; --accent-hover: #15803d;
+      --accent-glow: rgba(22,163,74,0.15); --accent-light: #dcfce7; --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.05); --radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #000000; --bg-alt: #050a05; --surface: #0a0a0a; --surface-hover: #052e16;
+      --text: #ffffff; --text-muted: #a3a3a3; --accent: #22c55e; --accent-hover: #16a34a;
+      --accent-glow: rgba(34,197,94,0.15); --accent-light: #052e16; --border: #1a1a1a;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:var(--transition);min-height:100vh}
+    .top-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:rgba(var(--bg),0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:1000}
+    .nav-left{display:flex;align-items:center;gap:1.5rem}
+    .logo{font-size:1.5rem;font-weight:800;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:0.5rem}
+    .nav-links{display:flex;gap:1rem;list-style:none}
+    .nav-links a{color:var(--text-muted);text-decoration:none;font-weight:500;font-size:0.9rem;padding:0.5rem 1rem;border-radius:var(--radius);transition:var(--transition)}
+    .nav-links a:hover{color:var(--accent);background:var(--accent-glow)}
+    .nav-right{display:flex;align-items:center;gap:1rem}
+    .theme-toggle{background:none;border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:var(--radius);font-weight:600;font-size:0.95rem;cursor:pointer;transition:var(--transition);border:none;text-decoration:none}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 10px 25px -5px var(--accent-glow)}
+    .btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 4rem;position:relative;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,var(--accent-glow) 0%,transparent 50%),radial-gradient(circle at 80% 80%,var(--accent-glow) 0%,transparent 50%);opacity:0.6;pointer-events:none}
+    .hero h1{font-size:clamp(3rem,8vw,6rem);font-weight:800;letter-spacing:-2px;margin-bottom:1rem;background:linear-gradient(135deg,var(--text) 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:1.25rem;color:var(--text-muted);max-width:600px;margin-bottom:2rem}
+    .hero-cta{display:flex;gap:1rem;margin-bottom:4rem}
+    .stats-section{padding:4rem 2rem;background:var(--bg-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;max-width:1200px;margin:0 auto}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;transition:var(--transition);position:relative;overflow:hidden}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform 0.3s}
+    .stat-card:hover::before{transform:scaleX(1)}
+    .stat-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:var(--accent)}
+    .stat-icon{font-size:2.5rem;margin-bottom:1rem}
+    .stat-number{font-size:2.5rem;font-weight:800;color:var(--accent);display:block;margin-bottom:0.5rem}
+    .stat-label{color:var(--text-muted);font-size:0.95rem}
+    .gallery-section{padding:6rem 2rem;max-width:1200px;margin:0 auto}
+    .section-header{text-align:center;margin-bottom:3rem}
+    .section-header h2{font-size:2.5rem;font-weight:700;margin-bottom:0.5rem}
+    .section-header p{color:var(--text-muted);font-size:1.1rem}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+    .gallery-card{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:var(--transition);background:var(--surface)}
+    .gallery-card:hover{transform:scale(1.02);box-shadow:var(--shadow)}
+    .gallery-card img{width:100%;height:220px;object-fit:cover;display:block}
+    .gallery-card-content{padding:1.5rem}
+    .gallery-card h3{font-size:1.1rem;margin-bottom:0.5rem}
+    .gallery-card p{color:var(--text-muted);font-size:0.9rem}
+    .footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-muted);font-size:0.875rem;background:var(--bg)}
+    .hidden{opacity:0;transform:translateY(20px);transition:all 0.6s ease}
+    .visible{opacity:1;transform:translateY(0)}
+    @media(max-width:768px){.hero h1{font-size:2.5rem}.stats-grid,.gallery-grid{grid-template-columns:1fr}.top-nav{padding:1rem}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="index.html" class="logo">🌾 CropVault</a>
+      <ul class="nav-links">
+        <li><a href="login.html">Login</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <h1>CropVault</h1>
+    <p>Secure your harvest and lock in your profits. Smart farming tools that protect your crops, cut your costs, and grow your margins.</p>
+    <div class="hero-cta">
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <a href="#stats" class="btn btn-outline">See Impact</a>
+    </div>
+  </section>
+
+  <section class="stats-section" id="stats">
+    <div class="stats-grid hidden">
+      <div class="stat-card"><div class="stat-icon">👨‍🌾</div><span class="stat-number">0</span><div class="stat-label">Farmers Helped</div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><span class="stat-number">$0</span><div class="stat-label">Money Saved</div></div>
+      <div class="stat-card"><div class="stat-icon">🌱</div><span class="stat-number">0 ha</span><div class="stat-label">Land Optimized</div></div>
+      <div class="stat-card"><div class="stat-icon">💧</div><span class="stat-number">0 L</span><div class="stat-label">Water Saved</div></div>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="section-header hidden"><h2>Thriving Farms</h2><p>Real results from farmers using CropVault across the globe</p></div>
+    <div class="gallery-grid hidden">
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+      <div class="gallery-card"><img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&h=400&fit=crop" alt="farm"><div class="gallery-card-content"><h3>Your Farm Here</h3><p>Start tracking your farm's performance today.</p></div></div>
+    </div>
+  </section>
+
+  <footer class="footer"><p>© 2026 CropVault. Secure your harvest.</p></footer>
+
+  <script>
+    const initTheme=()=>{const s=localStorage.getItem('cropvault-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',s);document.querySelector('.theme-toggle').textContent=s==='dark'?'☀️':'🌙'};
+    const toggleTheme=()=>{const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('cropvault-theme',n);document.querySelector('.theme-toggle').textContent=n==='dark'?'☀️':'🌙'};
+    const initScroll=()=>{const o=new IntersectionObserver((e)=>{e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');en.target.classList.remove('hidden')}})},{threshold:0.1});document.querySelectorAll('.hidden').forEach(el=>o.observe(el))};
+    document.addEventListener('DOMContentLoaded',()=>{initTheme();initScroll()});
+  </script>
+</body>
+</html>
